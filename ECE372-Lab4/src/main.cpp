@@ -98,11 +98,13 @@ int main()
       // }
 
       //Turn off the motor here using the seven segment display
+      motorRun = 0;
       state = countdown;
       break;
     case countdown:
       //Insert seven segment stuff here
       seg.countDown_Seconds(9);
+      motorRun = 1;
       state = wait_press;
       break;
     }
