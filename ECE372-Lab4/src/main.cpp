@@ -52,7 +52,7 @@ int main()
   while (1)
   {
 
-    if (motorRun == 1)
+    if (motorRun == 1) //Triggers motor turning on if flag is turned on
     {
       result = ADCL;
       result += (((unsigned int) ADCH) << 8);
@@ -68,13 +68,11 @@ int main()
     {
     case wait_press:
       delayMs(delay);
-      //_delay_ms(SHORT_DELAY);
       break;
     case debounce_press:
       state = wait_release;
       break;
     case wait_release:
-      //_delay_ms(SHORT_DELAY);
       delayMs(delay);
       break;
     case debounce_release:
@@ -93,11 +91,7 @@ int main()
   return 0;
 }
 
-/* Implement an Pin Change Interrupt which handles the switch being
- * pressed and released. When the switch is pressed and released, the LEDs
- * change at twice the original rate. If the LEDs are already changing at twice
- * the original rate, it goes back to the original rate.
- */
+
 ISR(INT0_vect)
 {
   if (state == wait_press)

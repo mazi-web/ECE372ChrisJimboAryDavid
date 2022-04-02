@@ -19,7 +19,7 @@ void initTimer1(){
     OCR1A = 15625;
 }
 
-/* This delays the program an amount of microseconds specified by unsigned int delay.
+/* This delays the program an amount of seconds specified by unsigned int delay.
 */
 void delayS(unsigned int delay){
     unsigned int delayCnt = 0;
