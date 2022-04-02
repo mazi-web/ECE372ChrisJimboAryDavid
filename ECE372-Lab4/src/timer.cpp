@@ -251,11 +251,11 @@ bool timer::delay_timer(unsigned int delay, bool isTemporary){
             break;
         }
         case 2:{  // miliseconds
-            if(timerNum == 0 || timerNum == 2){ ocrValue = 62 * delay; prescaler = 256; } // 16000000 * delay / 256 / 1000
+            if(timerNum == 0 || timerNum == 1){ ocrValue = 62 * delay; prescaler = 256; } // 16000000 * delay / 256 / 1000
             else { ocrValue = 250 * delay; prescaler = 64;  } // 16000000 * delay / 64 / 1000
             break;
         }
-        case 3: case 4: case 5:{ ocrValue = 2 * delay; prescaler = 8; break; } // microseconds: 16000000 * delay / 8 / 1000000
+        case 3: { ocrValue = 2 * delay; prescaler = 8; break; } // microseconds: 16000000 * delay / 8 / 1000000
     }
 
     switch(this->timerNum){

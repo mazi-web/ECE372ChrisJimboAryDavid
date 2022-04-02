@@ -67,7 +67,7 @@ void changeDutyCycle(int result){
 
     else if(result > 524){
         OCR3A = (1023/499)*result;
-        OCR4A = 0;
+        OCR4A = 1023;
     }
 
     else {

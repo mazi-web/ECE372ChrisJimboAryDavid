@@ -11,13 +11,14 @@
 #include <avr/interrupt.h>
 #include "timer.h"
 
-class seven_segment{
+class seven_segment
+{
 private:
     timer *timer_ms;
 
 public:
     void init_SevenSegment(timer *new_timer_s);
-    bool countDown_Seconds(unsigned int startTime);
+    bool countDown_Seconds(int startTime);
     bool sendDigit(unsigned int number);
 };
 

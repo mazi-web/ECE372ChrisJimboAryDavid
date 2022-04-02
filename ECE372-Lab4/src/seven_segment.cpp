@@ -25,7 +25,7 @@ void seven_segment::init_SevenSegment(timer *new_timer_ms){
     timer_ms = new_timer_ms;
 }
 
-bool seven_segment::countDown_Seconds(unsigned int start){
+bool seven_segment::countDown_Seconds(int start){
     while(start >= 0){
         if(!sendDigit(start)){ return false; } //if sendDigit has a failure, quit
 
