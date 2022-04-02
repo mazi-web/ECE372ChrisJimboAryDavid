@@ -14,6 +14,7 @@
 #include "pwm.h"
 #include "adc.h"
 #include "sevsegdisp.h"
+#include "seven_segment.h"
 #include "switch.h"
 #include "timer.h"
 #include <util/delay.h>
@@ -33,15 +34,25 @@ typedef enum state
 } stateType;
 volatile stateType state = wait_press;
 
+
+
 int main()
 {
+  cli();
+  timer timer0_ms;
+  timer timer1_ms;
+  timer0_ms.init_timer(0, 2, 2);
+  timer1_ms.init_timer(1, 2, 2);
   initPWM3();
   initPWM4();
   initADC();
-  initSevSegDisp();
+  //initSevSegDisp();
+  seven_segment seg;
+  seg.init_SevenSegment(&timer1_ms);
   initSwitch();
-  initTimer0();
-  initTimer1();
+  //initTimer0();
+  //initTimer1();
+
   /*
    * Implement a state machine in the while loop which achieves the assignment
    * requirements.
@@ -68,13 +79,13 @@ int main()
     switch (state)
     {
     case wait_press:
-      delayMs(delay);
+      timer0_ms.delay_timer(delay, true);
       break;
     case debounce_press:
       state = wait_release;
       break;
     case wait_release:
-      delayMs(delay);
+      timer0_ms.delay_timer(delay, true);
       break;
     case debounce_release:
       // if (delay == SHORT_DELAY)
@@ -91,6 +102,7 @@ int main()
       break;
     case countdown:
       //Insert seven segment stuff here
+      seg.countDown_Seconds(9);
       state = wait_press;
       break;
     }

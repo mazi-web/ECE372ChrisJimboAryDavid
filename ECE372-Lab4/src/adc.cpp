@@ -29,12 +29,12 @@ void initADC(){
 
     // ADC Clock Frequency. Prescaler of 128. 
 
-    ADCSRA |= ( 1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0)
+    ADCSRA |= ( 1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
 
     // Disable ADC0 Pin Digital input 
     //Pin is A0
 
-    DIDR0 |= (1 << ADC7D);
+    DDRA |= (1 << ADC7D);
 
     //Start ADC! 
 
