@@ -60,27 +60,17 @@ void changeDutyCycle(int result){
         OCR4A = 1023;
     }
 
-    else if(result == 0){
-        OCR3A = 1023;
-        OCR4A = 1023;
+    else if(result < 500){
+        OCR3A = 0;
+        OCR4A = (1023/499)*result;
     }
 
-    else if(result < 512){
-        OCR3A = result/1023;
+    else if(result > 524){
+        OCR3A = (1023/499)*result;
         OCR4A = 0;
     }
 
-    else if(result == 512){
-        OCR3A = 0;
-        OCR4A = 0;
-    }
-
-    else if(result == 512){
-        OCR3A = 0;
-        OCR4A = 1023;//Zero for timer 4, reverse
-    }
-
-    else if(result == 1023){
+    else {
         OCR3A = 0;
         OCR4A = 1023;
     }
