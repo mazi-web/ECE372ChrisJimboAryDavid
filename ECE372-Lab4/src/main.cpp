@@ -28,7 +28,8 @@ typedef enum state
   wait_press,
   debounce_press,
   wait_release,
-  debounce_release
+  debounce_release,
+  countdown
 } stateType;
 volatile stateType state = wait_press;
 
@@ -76,14 +77,20 @@ int main()
       delayMs(delay);
       break;
     case debounce_release:
-      if (delay == SHORT_DELAY)
-      {
-        delay = LONG_DELAY;
-      }
-      else if (delay == LONG_DELAY)
-      {
-        delay = SHORT_DELAY;
-      }
+      // if (delay == SHORT_DELAY)
+      // {
+      //   delay = LONG_DELAY;
+      // }
+      // else if (delay == LONG_DELAY)
+      // {
+      //   delay = SHORT_DELAY;
+      // }
+
+      //Turn off the motor here using the seven segment display
+      state = countdown;
+      break;
+    case countdown:
+      //Insert seven segment stuff here
       state = wait_press;
       break;
     }
