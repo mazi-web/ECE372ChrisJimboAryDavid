@@ -51,25 +51,19 @@ void initPWM4(){
     OCR4A = 1023;
 }
 
-void changeDutyCycle(int result){
+void changeDutyCycle(unsigned int result){
     //Trucate the 10-bit value which has a range of 0-1023 in decimal to have a range of 0-5V and use that as the input here
     //Consider left shift by 8
     //Incompletre for now
-    if(result == -1){
-        OCR3A = 0;
-        OCR4A = 1023;
-    }
 
-    else if(result < 500){
+    if(result < 500){
         OCR3A = 0;
         OCR4A = (1023/499)*result;
     }
-
     else if(result > 524){
         OCR3A = (1023/499)*result;
         OCR4A = 1023;
     }
-
     else {
         OCR3A = 0;
         OCR4A = 1023;

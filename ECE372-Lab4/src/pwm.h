@@ -6,6 +6,6 @@
 
 void initPWM3();
 void initPWM4();
-void changeDutyCycle(int result);
+void changeDutyCycle(unsigned int result);
 
 #endif
