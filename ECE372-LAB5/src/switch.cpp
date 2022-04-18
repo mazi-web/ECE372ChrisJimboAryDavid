@@ -12,7 +12,7 @@
  */
 void initSwitch(){
 //Set Data direction for input
-    DDRB &= ~(1 << PORTD0);
+    DDRD &= ~(1 << PORTD0);
 
     //Enable pullup resistor for stable reading between 0 and 1
     PORTD |= (1 << PORTD0);
