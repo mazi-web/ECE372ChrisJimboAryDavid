@@ -8,14 +8,15 @@
 //
 //----------------------------------------------------------------------//
 
-
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <Arduino.h>
 
 #include "pwm.h"
 #include "switch.h"
 #include "timer.h"
-
+#include "i2c.h"
+#include "spi.h"
 
 #define SHORT_DELAY 100
 #define LONG_DELAY 200
@@ -28,61 +29,98 @@ typedef enum state
   debounce_release
 } stateType;
 
+typedef enum accelerometerState
+{
+  initialState,
+  trippedState,
+  turnOffState
+} stateTypeAcceleroMeterState;
+
 volatile stateType state = wait_press;
+volatile stateTypeAcceleroMeterState accelState = initialState;
 
-
+volatile int x, y, z = 0;
 
 int main()
 {
   cli();
   timer timer0_ms(TIMER0, 2, MILISECONDS);
   timer timer1_ms(TIMER1, 2, MILISECONDS);
-  //SevenSegment seg7_1(&timer1_ms);
 
-  initPWM3();
-  initPWM4();
-  //initADC();
-  initSwitch();
+  initI2C(); //I2C being used by accelerometer
+  initSwitch(); //Switch to turn off buzzer
+  SPI_MASTER_Init(); //SPI being used by 8x8 Matrix display
+  initPWM3(); //Piezo buzzer
   sei();
 
   uint8_t delay = SHORT_DELAY;
-  bool motorRun = true;
-
-  while(true)
+  while (true)
   {
-    // if (motorRun) //Triggers motor turning on if flag is turned on
-    // {
-    //   changeDutyCycle(ADCL + (ADCH << 8));
-    // }
-    // else
-    // {
-    //   changeDutyCycle(525); // Set to 525 to stop motor (Between 500 & 525)
-    // }
+    //Initialize accelerometer SPI communication
+    StartI2C_Trans(0x68); //based off pg 46 of Who Am I reg
+
+    //Wake up accelerometer
+    //Already done in the I2C initialization stage
+
+    Read_from(0x68, 0x3B); //XOut high
+    x |= (Read_data() << 8); //Getting upper half into x
+    Read_from(0x68, 0x3C); //XOut low
+    x |= (Read_data()); //Getting lower half into x
     
+    Read_from(0x68, 0x3D); //YOut high
+    y |= (Read_data() << 8); //Getting upper half into y
+    Read_from(0x68, 0x3E); //YOut lower
+    y |= (Read_data()); //Getting lower half into y
+
+    Read_from(0x68, 0x3F); //ZOut high
+    z |= (Read_data() << 8); //Getting upper half into z
+    Read_from(0x68, 0x40); //Zout low
+    z |= (Read_data()); //Getting lower half into z
+
+    Serial.println("X Data: " + x);
+    Serial.println("Y Data" + y);
+    Serial.println("Z Data: " + z);
+
+    //Stop I2C transmission
+    StopI2C_Trans();
 
     switch (state)
     {
-      case wait_press:
-        timer0_ms.delay_timer(delay);
-        break;
+    case wait_press:
+      timer0_ms.delay_timer(delay);
+      break;
 
-      case debounce_press:
-        state = wait_release;
-        break;
+    case debounce_press:
+      state = wait_release;
+      break;
 
-      case wait_release:
-        timer0_ms.delay_timer(delay);
-        break;
+    case wait_release:
+      timer0_ms.delay_timer(delay);
+      //PWM change frequency stuff
+      break;
 
-      case debounce_release:
-        motorRun = false;
-        state = wait_press;
-        break;
+    case debounce_release:
+      state = wait_press;
+      break;
+    }
+
+    switch (accelState)
+    {
+    case initialState:
+      /* code */
+      break;
+    case trippedState:
+      /* code */
+      break;
+    case turnOffState:
+      /* code */
+      break;
+    default:
+      break;
     }
   }
   return 0;
 }
-
 
 ISR(INT0_vect)
 {
