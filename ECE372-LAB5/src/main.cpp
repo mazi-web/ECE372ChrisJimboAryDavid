@@ -21,6 +21,9 @@
 #define SHORT_DELAY 100
 #define LONG_DELAY 200
 
+#define PWR_MGMT 0x6B
+#define WAKEUP 0x00
+
 typedef enum state
 {
   wait_press,
@@ -52,6 +55,11 @@ int main()
   Serial.println("I2C Configed");
   initSwitch();      // Switch to turn off buzzer
   SPI_MASTER_Init(); // SPI being used by 8x8 Matrix display
+  // initialize 8 x 8 LED array (info from MAX7219 datasheet)
+  write_execute(0x0A, 0x08); // brightness control
+  write_execute(0x0B, 0x07); // scanning all rows and columns
+  write_execute(0x0C, 0x01); // set shutdown register to normal operation (0x01)
+  write_execute(0x0F, 0x00); // display test register - set to normal operation (0x01)
   Serial.println("SPI configed");
   initPWM_Pins(); // Piezo buzzer
   Serial.println("PWM configed");
@@ -74,12 +82,14 @@ int main()
     // spi_smile_maker(true);
 
     // Wake up accelerometer
+    write(PWR_MGMT); // address on SLA for Power Management
+    write(WAKEUP);   // send data to Wake up from sleep mode
     // Already done in the I2C initialization stage
 
-    Read_from(0x68, 0x3B);   // XOut high
+    Read_from(0x68, 0x3B);  // XOut high
     x = (Read_data() << 8); // Getting upper half into x
-    Read_from(0x68, 0x3C); // XOut low
-    //x |= (Read_data());    // Getting lower half into x
+    Read_from(0x68, 0x3C);  // XOut low
+    // x |= (Read_data());    // Getting lower half into x
     x = (x << 8) | Read_data();
     Serial.print("X:");
     Serial.println(x);
@@ -99,12 +109,16 @@ int main()
     Serial.println(z);
     timer1_ms.delay_timer(500);
 
-    //Serial.println("X Data: " + x);
-    //Serial.println("Y Data" + y);
-    //Serial.println("Z Data: " + z);
+    // Serial.println("X Data: " + x);
+    // Serial.println("Y Data" + y);
+    // Serial.println("Z Data: " + z);
 
     // Stop I2C transmission
     StopI2C_Trans();
+
+    Serial.println("Before smile");
+    //spi_smile_maker(false);
+    Serial.println("After smile");
 
     switch (state)
     {
@@ -124,7 +138,8 @@ int main()
 
     case debounce_release:
       state = wait_press;
-      buttonPressed = false;
+      buttonPressed = !(buttonPressed);
+      IncFrequency(0);
       break;
     }
 
@@ -132,18 +147,20 @@ int main()
     {
     case initialState:
       spi_smile_maker(true);
-      if (x == 150 && y == 150 && z == 150)
+      if (x >= 150 && y >= 150 && z >= 150)
       {
         accelState = trippedState;
-        IncFrequency(1000);
+        if(buttonPressed == false){
+          IncFrequency(0);
+        }
       }
       break;
     case trippedState:
       spi_smile_maker(false);
-      if (buttonPressed == true)
+      if (x <= 150 && y <= 150 && z <= 150)
       {
         accelState = initialState;
-        IncFrequency(0);
+        //IncFrequency(0);
       }
 
       break;
