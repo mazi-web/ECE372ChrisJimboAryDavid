@@ -48,16 +48,16 @@ int main()
   uint8_t delay = SHORT_DELAY;
   bool motorRun = true;
 
-  // while(true)
-  // {
-  //   if (motorRun) //Triggers motor turning on if flag is turned on
-  //   {
-  //     changeDutyCycle(ADCL + (ADCH << 8));
-  //   }
-  //   else
-  //   {
-  //     changeDutyCycle(525); // Set to 525 to stop motor (Between 500 & 525)
-  //   }
+  while(true)
+  {
+    // if (motorRun) //Triggers motor turning on if flag is turned on
+    // {
+    //   changeDutyCycle(ADCL + (ADCH << 8));
+    // }
+    // else
+    // {
+    //   changeDutyCycle(525); // Set to 525 to stop motor (Between 500 & 525)
+    // }
     
 
     switch (state)
@@ -79,7 +79,7 @@ int main()
         state = wait_press;
         break;
     }
-  //}
+  }
   return 0;
 }
 
