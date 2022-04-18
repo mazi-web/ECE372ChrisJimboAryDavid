@@ -45,7 +45,6 @@ volatile int x, y, z = 0;
 int main()
 {
   cli();
-  timer timer0_ms(TIMER0, 2, MILISECONDS);
   timer timer1_ms(TIMER1, 2, MILISECONDS);
 
   initI2C(); //I2C being used by accelerometer
@@ -88,7 +87,7 @@ int main()
     switch (state)
     {
     case wait_press:
-      timer0_ms.delay_timer(delay);
+      timer1_ms.delay_timer(delay);
       break;
 
     case debounce_press:
@@ -96,7 +95,7 @@ int main()
       break;
 
     case wait_release:
-      timer0_ms.delay_timer(delay);
+      timer1_ms.delay_timer(delay);
       //PWM change frequency stuff
       buttonPressed = true;
       break;
