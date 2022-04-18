@@ -10,7 +10,9 @@
 #define SPI_PORT PORTB // PortB for SPI on ATMEGA2560 is PORTB
 #define SPI_SS_BIT PORTB0 // Port B register Bit B0 of Chip Select on ATMEGA2560 is PORTB0
 
-#define wait_for_complete while(!(SPSR & (1 << SPIF)));
+#define wait_for_complete while(!(SPSR & (1 << SPIF)))
+#define smiley 0x007ec38124242400
+#define frowny 0x00423c0000662400
 
 
 void SPI_MASTER_Init() {
@@ -28,7 +30,7 @@ void SPI_MASTER_Init() {
 
     }
 
-    void write_execute(unsigned char CMD, unsigned char data) {
+    void write_execute(unsigned char CMD, uint16_t data) {
         SPI_PORT &= ~(1 << SPI_SS_BIT);  // enable chip select bit to begin SPI frame
         SPDR = CMD; // load the CMD address into register
         wait_for_complete; // wait for flag to raise
@@ -46,20 +48,33 @@ void spi_smile_maker(bool smile ){
     if(smile == true ){
 
         //smile
+        //address
+        uint8_t row;
+        for(int i = 0; i < 8; i++ ){
+            data =(smiley >> i*8) & 0xFF;
+            write_execute(8-i, data);
+            
 
-        
+        }
+
+
+
 
     }
-    else if ( smile == false ){
+    else {
         
         // frowny 
+         uint8_t row;
+        for(int i = 0; i < 8; i++ ){
+            data =(frowny >> i*8) & 0xFF;
+            write_execute(8-i, data);
+            
+
+        }
 
 
     }
-    else 
-    {
-
-
+    
     }
 
 
