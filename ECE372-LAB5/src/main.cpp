@@ -38,6 +38,8 @@ typedef enum accelerometerState
 volatile stateType state = wait_press;
 volatile stateTypeAcceleroMeterState accelState = initialState;
 
+boolean buttonPressed = false;
+
 volatile int x, y, z = 0;
 
 int main()
@@ -49,7 +51,7 @@ int main()
   initI2C(); //I2C being used by accelerometer
   initSwitch(); //Switch to turn off buzzer
   SPI_MASTER_Init(); //SPI being used by 8x8 Matrix display
-  initPWM3(); //Piezo buzzer
+  initPWM_Pins(); //Piezo buzzer
   sei();
 
   uint8_t delay = SHORT_DELAY;
@@ -96,20 +98,33 @@ int main()
     case wait_release:
       timer0_ms.delay_timer(delay);
       //PWM change frequency stuff
+      buttonPressed = true;
       break;
 
     case debounce_release:
       state = wait_press;
+      buttonPressed = false;
       break;
     }
 
     switch (accelState)
     {
     case initialState:
-      /* code */
+      spi_smile_maker(true);
+      if (x == 150 && y == 150 && z == 150)
+      {
+        accelState = trippedState;
+        IncFrequency(1000);
+      }
       break;
     case trippedState:
-      /* code */
+      spi_smile_maker(false);
+      if (buttonPressed == true)
+      {
+        accelState = initialState;
+        IncFrequency(0);
+      }
+      
       break;
     default:
       break;
