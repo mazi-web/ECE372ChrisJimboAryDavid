@@ -43,12 +43,30 @@ volatile stateTypeAcceleroMeterState accelState = initialState;
 
 boolean buttonPressed = false;
 
-volatile int x, y, z = 0;
+volatile unsigned int x, y, z = 0;
+
+void turnOn()
+{
+  // prescaler 1
+  TCCR3B |= (1 << CS30);
+  TCCR3B &= ~((1 << CS31) | (1 << CS32));
+
+  // output
+  DDRE |= (1 << DDE5);
+}
+void turnOff()
+{
+  // prescaler no clock
+  TCCR3B &= ~((1 << CS31) | (1 << CS32) | (1 << CS30));
+
+  // low
+  PORTE &= ~(1 << PORTE5);
+}
 
 int main()
 {
   Serial.begin(9600);
-  cli();
+  turnOff();
   timer timer1_ms(TIMER_1, 2, MILISECONDS);
   Serial.println("Timer configed");
   initI2C(); // I2C being used by accelerometer
@@ -64,6 +82,7 @@ int main()
   initPWM_Pins(); // Piezo buzzer
   Serial.println("PWM configed");
   sei();
+  unsigned int buzzfreq;
 
   DDRB |= (1 << DDB7);
 
@@ -87,27 +106,26 @@ int main()
     // Already done in the I2C initialization stage
 
     Read_from(0x68, 0x3B);  // XOut high
-    x = (Read_data() << 8); // Getting upper half into x
+    x = Read_data(); // Getting upper half into x
     Read_from(0x68, 0x3C);  // XOut low
     // x |= (Read_data());    // Getting lower half into x
     x = (x << 8) | Read_data();
     Serial.print("X:");
-    Serial.println(x);
+    Serial.print(x);
 
     Read_from(0x68, 0x3D);   // YOut high
-    y |= (Read_data() << 8); // Getting upper half into y
+    y = Read_data(); // Getting upper half into y
     Read_from(0x68, 0x3E);   // YOut lower
-    y |= (Read_data());      // Getting lower half into y
-    Serial.print("Y:");
-    Serial.println(y);
+    y = (y << 8) | Read_data();      // Getting lower half into y
+    Serial.print(" Y:");
+    Serial.print(y);
 
     Read_from(0x68, 0x3F);   // ZOut high
-    z |= (Read_data() << 8); // Getting upper half into z
+    z = Read_data(); // Getting upper half into z
     Read_from(0x68, 0x40);   // Zout low
-    z |= (Read_data());      // Getting lower half into z
-    Serial.print("Z:");
+    z = (z << 8) | Read_data();      // Getting lower half into z
+    Serial.print(" Z:");
     Serial.println(z);
-    timer1_ms.delay_timer(500);
 
     // Serial.println("X Data: " + x);
     // Serial.println("Y Data" + y);
@@ -117,7 +135,7 @@ int main()
     StopI2C_Trans();
 
     Serial.println("Before smile");
-    //spi_smile_maker(false);
+    // spi_smile_maker(false);
     Serial.println("After smile");
 
     switch (state)
@@ -139,7 +157,14 @@ int main()
     case debounce_release:
       state = wait_press;
       buttonPressed = !(buttonPressed);
-      IncFrequency(0);
+      if (buttonPressed == false)
+      {
+        turnOff();
+      }
+      if (buttonPressed == true)
+      {
+        turnOn();
+      }
       break;
     }
 
@@ -147,28 +172,32 @@ int main()
     {
     case initialState:
       spi_smile_maker(true);
-      if (x >= 150 && y >= 150 && z >= 150)
+      if (z <= 8000)
       {
         accelState = trippedState;
-        if(buttonPressed == false){
-          IncFrequency(0);
-        }
+      }
+      if (buttonPressed == false)
+      {
+        buzzfreq = 4000;
+        IncFrequency(buzzfreq);
       }
       break;
     case trippedState:
       spi_smile_maker(false);
-      if (x <= 150 && y <= 150 && z <= 150)
+      if (z > 8000)
       {
         accelState = initialState;
-        //IncFrequency(0);
+        for (unsigned int i = 500; i < 10000; i++)
+        {
+          IncFrequency(i);
+        }
       }
-
-      break;
-    default:
-      break;
-    }
+    break;
+  default:
+    break;
   }
-  return 0;
+}
+return 0;
 }
 
 ISR(INT4_vect)

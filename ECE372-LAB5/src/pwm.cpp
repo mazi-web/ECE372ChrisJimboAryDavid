@@ -16,8 +16,8 @@ void initPWM_Pins()
 void IncFrequency(unsigned int frequency)
 {
     OCR4A = 16000000 / frequency;
-    OCR4AH = OCR4A >> 8;
-    OCR4AL = OCR4A;
-    OCR4CH = OCR4AH >> 1;
-    OCR4CL = OCR4AL >> 1;
+    //OCR4AH = OCR4A >> 8;
+    //OCR4AL = OCR4A;
+    //OCR4CH = OCR4AH >> 1;
+    //OCR4CL = OCR4AL >> 1;
 }
