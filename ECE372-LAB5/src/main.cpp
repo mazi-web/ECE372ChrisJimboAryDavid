@@ -32,8 +32,7 @@ typedef enum state
 typedef enum accelerometerState
 {
   initialState,
-  trippedState,
-  turnOffState
+  trippedState
 } stateTypeAcceleroMeterState;
 
 volatile stateType state = wait_press;
@@ -110,9 +109,6 @@ int main()
       /* code */
       break;
     case trippedState:
-      /* code */
-      break;
-    case turnOffState:
       /* code */
       break;
     default:
