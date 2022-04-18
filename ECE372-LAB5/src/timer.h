@@ -15,12 +15,12 @@
 #define MILISECONDS_HIFI 3
 #define MICROSECONDS 4
 
-#define TIMER0 0
-#define TIMER1 1
-#define TIMER2 2
-#define TIMER3 3
-#define TIMER4 4
-#define TIMER5 5
+#define TIMER_0 0
+#define TIMER_1 1
+#define TIMER_2 2
+#define TIMER_3 3
+#define TIMER_4 4
+#define TIMER_5 5
 
 #define INTERRUPT 0
 #define PAUSE 1

@@ -45,7 +45,7 @@ volatile int x, y, z = 0;
 int main()
 {
   cli();
-  timer timer1_ms(TIMER1, 2, MILISECONDS);
+  timer timer1_ms(TIMER_1, 2, MILISECONDS);
 
   initI2C(); //I2C being used by accelerometer
   initSwitch(); //Switch to turn off buzzer
