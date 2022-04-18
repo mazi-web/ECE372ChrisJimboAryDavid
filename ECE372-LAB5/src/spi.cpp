@@ -1,4 +1,4 @@
-#include <Arduino.h>
+
 #include "spi.h"
 #include <avr/interrupt.h>
 #include <avr/io.h>
@@ -10,7 +10,7 @@
 #define SPI_PORT PORTB // PortB for SPI on ATMEGA2560 is PORTB
 #define SPI_SS_BIT PORTB0 // Port B register Bit B0 of Chip Select on ATMEGA2560 is PORTB0
 
-#define wait_for_complete while(!(SPSR & (1 << SPIF)))
+#define wait_for_complete while(!(SPSR & (1 << SPIF)));
 #define smiley 0x007ec38124242400
 #define frowny 0x00423c0000662400
 
@@ -49,7 +49,7 @@ void spi_smile_maker(bool smile ){
 
         //smile
         //address
-        uint8_t row;
+        uint8_t data;
         for(int i = 0; i < 8; i++ ){
             data =(smiley >> i*8) & 0xFF;
             write_execute(8-i, data);
@@ -64,7 +64,7 @@ void spi_smile_maker(bool smile ){
     else {
         
         // frowny 
-         uint8_t row;
+         uint8_t data;
         for(int i = 0; i < 8; i++ ){
             data =(frowny >> i*8) & 0xFF;
             write_execute(8-i, data);
@@ -75,7 +75,7 @@ void spi_smile_maker(bool smile ){
 
     }
     
-    }
+    
 
 
 }
