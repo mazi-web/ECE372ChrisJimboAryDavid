@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include "SPI.h"
+#include "spi.h"
 #include <avr/interrupt.h>
 #include <avr/io.h>
 
@@ -36,3 +36,31 @@ void SPI_MASTER_Init() {
         wait_for_complete; // wait for flag to raise
         SPI_PORT |= (1 << SPI_SS_BIT); // disable chip select to end SPI frame
     }
+void spi_smile_maker(bool smile ){
+
+    // This will check which smile we need frowny or smiling.
+    // 1 will be smile and 0 will be frown
+
+
+
+    if(smile == true ){
+
+        //smile
+
+        
+
+    }
+    else if ( smile == false ){
+        
+        // frowny 
+
+
+    }
+    else 
+    {
+
+
+    }
+
+
+}
