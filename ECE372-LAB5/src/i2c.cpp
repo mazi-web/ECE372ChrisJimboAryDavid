@@ -17,10 +17,15 @@ void initI2C(){
 void StartI2C_Trans(unsigned char SLA){
 //Start Condition
     TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWSTA);
+    //Serial.println("Trigger Action Complete");
     wait_for_completion;
+    //Serial.println("Wait complete");
+    //delay(150);
     TWDR = (SLA << 1);
     TWCR = (1 << TWINT) | (1 << TWEN);
     wait_for_completion;
+    //Serial.println("Start Trans Complete");
+    //delay(50);
 }
 
 void StopI2C_Trans(){
@@ -54,3 +59,4 @@ unsigned char Read_data() // Returns the last byte  from the data register
 {
   return TWDR;
 }
+

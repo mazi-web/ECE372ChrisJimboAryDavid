@@ -9,8 +9,7 @@
 #define SPI_SS_BIT PORTB0 // Port B register Bit B0 of Chip Select on ATMEGA2560 is PORTB0
 
 #define wait_for_complete         \
-    while (!(SPSR & (1 << SPIF))) \
-        ;
+    while (!(SPSR & (1 << SPIF)));
 #define smiley 0x007ec38124242400
 #define frowny 0x00423c0000662400
 
