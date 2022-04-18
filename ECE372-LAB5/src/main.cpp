@@ -25,8 +25,7 @@ typedef enum state
   wait_press,
   debounce_press,
   wait_release,
-  debounce_release,
-  countdown
+  debounce_release
 } stateType;
 
 volatile stateType state = wait_press;
@@ -49,16 +48,16 @@ int main()
   uint8_t delay = SHORT_DELAY;
   bool motorRun = true;
 
-  while(true)
-  {
-    if (motorRun) //Triggers motor turning on if flag is turned on
-    {
-      changeDutyCycle(ADCL + (ADCH << 8));
-    }
-    else
-    {
-      changeDutyCycle(525); // Set to 525 to stop motor (Between 500 & 525)
-    }
+  // while(true)
+  // {
+  //   if (motorRun) //Triggers motor turning on if flag is turned on
+  //   {
+  //     changeDutyCycle(ADCL + (ADCH << 8));
+  //   }
+  //   else
+  //   {
+  //     changeDutyCycle(525); // Set to 525 to stop motor (Between 500 & 525)
+  //   }
     
 
     switch (state)
@@ -77,16 +76,10 @@ int main()
 
       case debounce_release:
         motorRun = false;
-        state = countdown;
-        break;
-
-      case countdown:
-        //seg7_1.countDown_Seconds(9);
-        motorRun = true;
         state = wait_press;
         break;
     }
-  }
+  //}
   return 0;
 }
 
