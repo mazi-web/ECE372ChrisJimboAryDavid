@@ -1,5 +1,5 @@
 #include <avr/io.h>
-#include "PWM.h"
+#include "pwm.h"
 // use timer 4 for calculatons of variable freq
 void initPWM_Pins()
 {
