@@ -18,8 +18,8 @@
 #include "i2c.h"
 #include "spi.h"
 
-#define SHORT_DELAY 100
-#define LONG_DELAY 200
+#define SHORT_DELAY 10
+#define LONG_DELAY 20
 
 #define PWR_MGMT 0x6B
 #define WAKEUP 0x00
@@ -41,26 +41,26 @@ typedef enum accelerometerState
 volatile stateType state = wait_press;
 volatile stateTypeAcceleroMeterState accelState = initialState;
 
-boolean buttonPressed = false;
+boolean turnedOn = false;
 
 volatile unsigned int x, y, z = 0;
 
 void turnOn()
 {
   // prescaler 1
-  TCCR3B |= (1 << CS30);
-  TCCR3B &= ~((1 << CS31) | (1 << CS32));
+  TCCR4B |= (1 << CS40);
+  TCCR4B &= ~((1 << CS41) | (1 << CS42));
 
   // output
-  DDRE |= (1 << DDE5);
+  DDRH |= (1 << DDH5);
 }
 void turnOff()
 {
   // prescaler no clock
-  TCCR3B &= ~((1 << CS31) | (1 << CS32) | (1 << CS30));
+  TCCR4B &= ~((1 << CS41) | (1 << CS42) | (1 << CS40));
 
   // low
-  PORTE &= ~(1 << PORTE5);
+  DDRH &= ~(1 << DDH5);
 }
 
 int main()
@@ -80,9 +80,10 @@ int main()
   write_execute(0x0F, 0x00); // display test register - set to normal operation (0x01)
   Serial.println("SPI configed");
   initPWM_Pins(); // Piezo buzzer
+  turnOff();
   Serial.println("PWM configed");
   sei();
-  unsigned int buzzfreq;
+  //unsigned int buzzfreq;
 
   DDRB |= (1 << DDB7);
 
@@ -151,20 +152,22 @@ int main()
     case wait_release:
       timer1_ms.delay_timer(delayA);
       // PWM change frequency stuff
-      buttonPressed = true;
+      //buttonPressed = true;
       break;
 
     case debounce_release:
       state = wait_press;
-      buttonPressed = !(buttonPressed);
-      if (buttonPressed == false)
-      {
-        turnOff();
-      }
-      if (buttonPressed == true)
-      {
-        turnOn();
-      }
+      // buttonPressed = !(buttonPressed);
+      // if (buttonPressed == false)
+      // {
+      //   turnOff();
+      // }
+      // if (buttonPressed == true)
+      // {
+      //   turnOn();
+      // }
+      turnOff();
+      turnedOn = false;
       break;
     }
 
@@ -172,25 +175,29 @@ int main()
     {
     case initialState:
       spi_smile_maker(true);
-      if (z <= 8000)
+      if (z <= 15000)
       {
         accelState = trippedState;
       }
-      if (buttonPressed == false)
+      if (turnedOn == true)
       {
-        buzzfreq = 4000;
-        IncFrequency(buzzfreq);
-      }
-      break;
-    case trippedState:
-      spi_smile_maker(false);
-      if (z > 8000)
-      {
-        accelState = initialState;
         for (unsigned int i = 500; i < 10000; i++)
         {
           IncFrequency(i);
         }
+      }
+      break;
+    case trippedState:
+      spi_smile_maker(false);
+      turnOn();
+      turnedOn = true;
+      for (unsigned int i = 500; i < 10000; i++)
+        {
+          IncFrequency(i);
+        }
+      if (z > 15000)
+      {
+        accelState = initialState;
       }
     break;
   default:
@@ -200,15 +207,18 @@ int main()
 return 0;
 }
 
+//ISR(PCINT0_vect)
 ISR(INT4_vect)
 {
   Serial.println("ISR Hours");
   if (state == wait_press)
   {
     state = debounce_press;
+    Serial.println("First If");
   }
   else if (state == wait_release)
   {
+    Serial.println("Second If");
     state = debounce_release;
   }
 }

@@ -23,4 +23,14 @@ void initSwitch(){
     EICRB |= (1 << ISC00);
     EICRB &= ~(1 << ISC01);
     EIMSK |= (1 << INT4);
+
+//  //Set Data direction for input
+//     DDRB &= ~(1 << PORTB4);
+
+//     //Enable pullup resistor for stable reading between 0 and 1
+//     PORTB |= (1 << PORTB4);
+
+//     //Enable the pins for interrupt
+//     PCICR |= (1 << PCIE0); // enable PCINT 0 - 7
+//     PCMSK0 |= (1 << PCINT4); // enable PCINT5
 }
