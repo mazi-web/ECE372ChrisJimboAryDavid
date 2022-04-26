@@ -175,7 +175,7 @@ int main()
     {
     case initialState:
       spi_smile_maker(true);
-      if (z <= 15000)
+      if (z <= 15800)
       {
         accelState = trippedState;
       }
@@ -195,7 +195,7 @@ int main()
         {
           IncFrequency(i);
         }
-      if (z > 15000)
+      if (z > 15800)
       {
         accelState = initialState;
       }
