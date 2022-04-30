@@ -19,6 +19,12 @@ void initADC(){
 
     ADMUX &= ~(1 << ADLAR);
 
+    // // Specify ADC input channel and mode
+    // //Set ADC7 as single-ended input with MUX[5:0] = 0b000111
+    // ADMUX |= (1 << MUX2) | (1 << MUX1) | (1 << MUX0);
+    // ADMUX &= ~((1 << MUX4) | (1 << MUX3));
+    // ADCSRB &= ~(1 << MUX5);
+
     // Auto Trigger Source Selection
     // Free Running Mode. 
     ADCSRB &= ~((1 << ADTS2) | (1 << ADTS1) | (1 << ADTS0));
@@ -34,7 +40,7 @@ void initADC(){
     // Disable ADC0 Pin Digital input 
     //Pin is A0
 
-    DDRA |= (1 << ADC7D);
+    DDRA |= (1 << ADC0D);
 
     //Start ADC! 
 
