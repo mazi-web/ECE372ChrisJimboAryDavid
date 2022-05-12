@@ -25,7 +25,7 @@
 
 #define RES 250000
 
-#define NS_PER_SEC (1000000000L)          // Signed value since we want to be able to check for negative values of derivatives
+#define NS_PER_SEC (1000000000L)
 
 #define CYCLES_PER_SEC (F_CPU)
 
@@ -98,7 +98,9 @@ public:
 
 
 	//---------Manual Functions:
-
+	
+	// Not used in final project
+	// private variable maxBrightness determines maximum brightness. Not a "perfect way of doing this
 	inline void sendColor(uint8_t red, uint8_t green, uint8_t blue){
     	// Send green, red, then blue for WS2818
 		if(green > maxBrightness){
@@ -126,12 +128,15 @@ public:
     	//sendByte(red);
     	//sendByte(blue);
 	}
-
+	
+	// Used in final project
+	// uses sendByte 3 times, correctly adjusts maximum brightness
 	inline void sendHexColor(uint32_t hexValue, uint8_t brightness){
 		uint8_t red = ((hexValue >> 16) & 0xFF) * brightness / 255;
 		uint8_t green = ((hexValue >> 8) & 0xFF) * brightness / 255;
 		uint8_t blue = (hexValue & 0xFF) * brightness / 255;
-
+		
+		// ampltiude value of 4 V/V used to set minimum level before data sent, unique to this final project. Very audible amplitude is at 10 V/V
 		if(green > 4){ sendByte(green); }
 		else{ sendByte(0x00); }
 		if(red > 4){ sendByte(red); }
@@ -146,9 +151,12 @@ public:
 	//---------Predefined Functions:
 
 	void allLEDs_OFF();
-	void allLEDs_RGB(uint8_t red, uint8_t green, uint8_t blue);
+	void allLEDs_RGB(uint8_t red, uint8_t green, uint8_t blue); // test function
+	
+	//test function, sets multiple rainbows over a set of leds
 	void rainbowCycle(unsigned int frames , unsigned int frameAdvance, unsigned int pixelAdvance);
-
+	
+	// array of color values. hex representation for red, green, blue (0x8100CC is red=88, green=00, blue=CC) according to a predetermined FFT frequency window
 	uint32_t colorValues[32] = {0x610061,            // 0,2
                             0x8100cc,            // 625,0
                             0x6100ff,            // 1250,0
@@ -183,6 +191,8 @@ public:
                             0xff0000,            // 19375,1
 	};
 
+	//Simplistic pattern to send data out from FFT data array to leds
+	//Low frequencies at center, high frequencies at ends.
 	inline void FFT_Pattern(uint16_t Data[], uint16_t samples){
 		// Multiplier 1 = 150 LEDS
   		// Multipler  2 = 300 LEDS
@@ -191,29 +201,29 @@ public:
   		uint32_t colorTemp = 0;
 
   		cli();
-  		for(uint16_t i = samples/2; i > 0; i--){
-    		intensity = 0x00 | (Data[i-1] * 2);
-    		colorTemp = colorValues[i-1];
+  		for(uint16_t i = samples/2; i > 0; i--){ // This loop goes from high frequencies to low
+    		intensity = 0x00 | (Data[i-1] * 2); // 
+    		colorTemp = colorValues[i-1]; // to aquire the 24-bit hex color value. Loop determines color; starts at high frequency then goes to low.
 
 
     		if(i < 3){
-      			for(uint8_t j = 0; j < 8*mult; j++){ sendHexColor(colorTemp, intensity); }
+      			for(uint8_t j = 0; j < 8*mult; j++){ sendHexColor(colorTemp, intensity); } // For low frequencies, make them 8 leds long
     		}
     		else if(i < 9){
-      			for(uint8_t j = 0; j < 6*mult; j++){ sendHexColor(colorTemp, intensity); }
+      			for(uint8_t j = 0; j < 6*mult; j++){ sendHexColor(colorTemp, intensity); } // For low mid, make them 6 leds long
    			}
     		else if(i < 15){
-      			for(uint8_t j = 0; j < 5*mult; j++){ sendHexColor(colorTemp, intensity); }
+      			for(uint8_t j = 0; j < 5*mult; j++){ sendHexColor(colorTemp, intensity); } // For mid freqencies, make them 5 leds long
     		}
     		else{
-      			for(uint8_t j = 0; j < 4*mult; j++){ sendHexColor(colorTemp, intensity); }
+      			for(uint8_t j = 0; j < 4*mult; j++){ sendHexColor(colorTemp, intensity); } // For high frequencies, make them 4 leds long
     		}
   		}
-  		for(uint16_t i = 0; i < samples/2; i++){
+  		for(uint16_t i = 0; i < samples/2; i++){ // This loop goes from low frequencies to high
     		intensity = 0x00 | (Data[i] * 2);
     		colorTemp = colorValues[i];
 
-
+		// frequency led size same as above
     		if(i < 3){
       			for(uint8_t j = 0; j < 8*mult; j++){ sendHexColor(colorTemp, intensity); }
     		}
