@@ -21,7 +21,7 @@ unsigned int sampling_period_us;
 
 int8_t vReal[SAMPLES];
 int8_t vImag[SAMPLES];
-uint16_t barht[SAMPLES];
+uint16_t barht[SAMPLES/2];
 
 bool pauseProgram = false;
 //----End FFT Parameters
@@ -57,14 +57,16 @@ void sampleFFT(){
   }
 
   fix_fft(vReal, vImag, 6, 0);
-
-  for(unsigned int i = 0; i < SAMPLES; i++){
+  
+  // Compute magnitude from Real and Imaginary FFT output arrays
+  for(unsigned int i = 0; i < SAMPLES/2; i++){
     barht[i] = sqrt(pow(vReal[i], 2) + pow(vImag[i], 2));
   }
   
   /*
+    // Used for debugging
     Serial.println("Freq(Hz),Magnitude");
-  for(uint16_t i = 0; i < SAMPLES/2; i++){
+    for(uint16_t i = 0; i < SAMPLES/2; i++){
     
     Serial.print(round(i * 1.0 * SAMPLE_FREQ / SAMPLES));
     Serial.print(",");
@@ -90,9 +92,10 @@ int main() {
 
   //ADC
   ADC_1.init_AD7920();
+  timer3_ms.delay_timer(1, PAUSE); // To allow ADC to set up. Probably not needed
 
   //FFT
-  sampling_period_us = round(1000000*(1.0 / SAMPLE_FREQ)/1.28/100); // Not entirely needed unless sampling rate lowers; read other similar comment
+  //sampling_period_us = round(1000000*(1.0 / SAMPLE_FREQ)/1.28/100); // Not entirely needed unless sampling rate lowers; read other similar comment
   Serial.println(sampling_period_us);
 
   //SWITCH
@@ -104,15 +107,7 @@ int main() {
 
 
   // ---- START LOOP ----
-  timer3_ms.delay_timer(1, PAUSE); // For ADC
-
-  //ledStrip.rainbowCycle(1 , 20 , 5);
-
-  //temp = ADC_1.getData();
-
-  //Serial.println(temp);
-  //Serial.println(5 * (1.0*temp)/4095);
-  sampleFFT();
+  sampleFFT(); //Run first, primarily used for debugging
 
   while(true){
     if(!pauseProgram){
@@ -130,7 +125,7 @@ int main() {
 
 ISR(PCINT2_vect){
   if(!(PINK & 0x01)){
-    //sampleFFT();
+    //sampleFFT(); // For debugging, no longer used
     pauseProgram  = !pauseProgram;
   }
   
